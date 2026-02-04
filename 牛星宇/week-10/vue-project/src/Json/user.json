@@ -1,0 +1,60 @@
+{
+  "code": 1,
+  "message": "success",
+  "data": [
+    {
+      "id": 5,
+      "name": "张无忌",
+      "image": "https://web-framework.oss-cn-hangzhou.aliyuncs.com/web/5.jpg",
+      "gender": 1,
+      "job": "教学主管",
+      "entrydate": "2015-03-15",
+      "updatetime": "2022-10-01 12:00:00"
+    },
+    {
+      "id": 6,
+      "name": "周芷若",
+      "image": "https://web-framework.oss-cn-hangzhou.aliyuncs.com/web/6.jpg",
+      "gender": 2,
+      "job": "班主任",
+      "entrydate": "2019-07-22",
+      "updatetime": "2022-10-01 12:00:00"
+    },
+    {
+      "id": 7,
+      "name": "赵敏",
+      "image": "https://web-framework.oss-cn-hangzhou.aliyuncs.com/web/7.jpg",
+      "gender": 2,
+      "job": "学科组长",
+      "entrydate": "2017-09-01",
+      "updatetime": "2022-10-01 12:00:00"
+    },
+    {
+      "id": 8,
+      "name": "杨逍",
+      "image": "https://web-framework.oss-cn-hangzhou.aliyuncs.com/web/8.jpg",
+      "gender": 1,
+      "job": "讲师",
+      "entrydate": "2021-04-10",
+      "updatetime": "2022-10-01 12:00:00"
+    },
+    {
+      "id": 9,
+      "name": "小昭",
+      "image": "https://web-framework.oss-cn-hangzhou.aliyuncs.com/web/9.jpg",
+      "gender": 2,
+      "job": "助教",
+      "entrydate": "2022-01-05",
+      "updatetime": "2022-10-01 12:00:00"
+    },
+    {
+      "id": 10,
+      "name": "宋远桥",
+      "image": "https://web-framework.oss-cn-hangzhou.aliyuncs.com/web/10.jpg",
+      "gender": 1,
+      "job": "教学总监",
+      "entrydate": "2010-08-18",
+      "updatetime": "2022-10-01 12:00:00"
+    }
+  ]
+}
