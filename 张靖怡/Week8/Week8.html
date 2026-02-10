@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>更多JS</title>
+  <style>
+    body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif;color:#333;background:#fafafa;margin:0;padding:40px;line-height:1.8}
+    h1{font-size:32px;border-bottom:3px solid #39c5bb;padding-bottom:12px;margin-bottom:30px}
+    h2{font-size:24px;margin-top:50px;color:#39c5bb}
+    h3{font-size:20px;margin-top:30px;color:#35495e}
+    code{background:#f4f4f4;padding:3px 6px;border-radius:4px;font-family:Menlo,Monaco,Consolas,"Courier New",monospace}
+    pre{background:#f6f8fa;padding:18px;border-radius:6px;overflow-x:auto;font-size:15px;line-height:1.6}
+    ul{padding-left:28px}
+    .warn{color:#e74c3c;font-weight:bold}
+    .todo{background:#fffbe6;border-left:4px solid #faad14;padding:12px 16px;margin:16px 0}
+    .footer{margin-top:80px;font-size:14px;color:#39c5bb}
+  </style>
+</head>
+<body>
+
+
+
+
+<h2>节流（throttle）与防抖（debounce）  板</h2>
+<pre><code>// 防抖：连续触发只执行最后一次
+function debounce(fn, delay = 300) {
+  let timer = null
+  return function (...args) {
+    clearTimeout(timer)
+    timer = setTimeout(() => fn.apply(this, args), delay)
+  }
+}
+
+// 节流：单位时间内只执行一次
+function throttle(fn, wait = 300) {
+  let prev = 0
+  return function (...args) {
+    const now = Date.now()
+    if (now - prev > wait) {
+      prev = now
+      fn.apply(this, args)
+    }
+  }
+}</code></pre>
+<p class="todo">练习：给搜索框加 debounce，给滚动加载加 throttle，console 里看调用次数立刻降 90%。</p>
+
+<h2>深拷贝：JSON 的坑 & 简易递归实现</h2>
+<pre><code>const obj = { a: 1, b: { c: 2 }, d: new Date() }
+
+// JSON 版（函数、Date、undefined 会丢）
+const bad = JSON.parse(JSON.stringify(obj))
+
+// 递归版（只处理普通对象/数组）
+function deepClone(target) {
+  if (typeof target !== 'object' || target === null) return target
+  const clone = Array.isArray(target) ? [] : {}
+  for (const key in target) {
+    clone[key] = deepClone(target[key])
+  }
+  return clone
+}</code></pre>
+<p class="todo">实际项目用 lodash cloneDeep 或 structuredClone，但面试爱让手写。</p>
+
+<h2>模块化：import / export 花式写法</h2>
+<pre><code>// 一条 export
+export const api = axios.create({})
+
+// 默认导出
+export default api
+
+// 动态导入（按需加载）
+const LazyComp = () => import('./LazyComp.vue')</code></pre>
+<p class="todo">路由懒加载、组件异步注册都是动态 import，返回 Promise。</p>
+
+<h2>性能：requestIdleCallback 与 requestAnimationFrame</h2>
+<pre><code>// 浏览器空闲时执行低优先级任务
+requestIdleCallback(() => {
+  localStorage.setItem('bigData', JSON.stringify(hugeObj))
+})
+
+// 下一帧绘制前执行高优先级动画
+requestAnimationFrame(() => {
+  // 修改 transform / opacity
+})</code></pre>
+<p class="todo">长列表虚拟滚动就用 RAF 做批量渲染，UI 不卡顿。</p>
+
+<h2>安全：XSS 与 CSP 基础</h2>
+<ul>
+  <li>永远不要 `innerHTML = 用户输入`</li>
+  <li>用 `textContent` 或 Vue 的 `{{ }}`（已自动转义）</li>
+  <li>后端返回 HTML 片段时加 CSP 响应头：
+    <code>Content-Security-Policy: default-src 'self'</code>
+  </li>
+</ul>
+<p class="todo">在 axios 拦截器里统一给 Cookie 加 <code>SameSite=Strict</code>，防 CSRF。</p>
+
+<h2>易错</h2>
+<table>
+  <tr>
+    <th>易错点</th>
+    <th>表现</th>
+    <th>根因</th>
+    <th>解决方案</th>
+  </tr>
+  <tr>
+    <td>箭头函数里用 <code>this</code></td>
+    <td>undefined</td>
+    <td>没有自身 this</td>
+    <td>改回普通函数或在父作用域先存 <code>const self = this</code></td>
+  </tr>
+  <tr>
+    <td><code>await</code> 忘加 try/catch</td>
+    <td>白屏</td>
+    <td>Promise 异常冒泡</td>
+    <td>axios 拦截器里统一 catch + 提示</td>
+  </tr>
+  <tr>
+    <td>JSON 深拷贝丢 Date</td>
+    <td>时间变字符串</td>
+    <td>JSON 不支持 Date</td>
+    <td>用 <code>structuredClone</code> 或 lodash</td>
+  </tr>
+</table>
+
+<p>要过年了......</p>
+
+
+
+</div>
+
+</body>
+</html>
