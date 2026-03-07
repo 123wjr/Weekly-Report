@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>更多JS</title>
+  <style>
+    body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif;color:#333;background:#fafafa;margin:0;padding:40px;line-height:1.8}
+    h1{font-size:32px;border-bottom:3px solid #39c5bb;padding-bottom:12px;margin-bottom:30px}
+    h2{font-size:24px;margin-top:50px;color:#39c5bb}
+    h3{font-size:20px;margin-top:30px;color:#35495e}
+    code{background:#f4f4f4;padding:3px 6px;border-radius:4px;font-family:Menlo,Monaco,Consolas,"Courier New",monospace}
+    pre{background:#f6f8fa;padding:18px;border-radius:6px;overflow-x:auto;font-size:15px;line-height:1.6}
+    ul{padding-left:28px}
+    .warn{color:#e74c3c;font-weight:bold}
+    .todo{background:#fffbe6;border-left:4px solid #faad14;padding:12px 16px;margin:16px 0}
+    .footer{margin-top:80px;font-size:14px;color:#39c5bb}
+  </style>
+</head>
+<body>
+
+<h1>更多JS</h1>
+
+<h2>立即执行函数，防止全局污染</h2>
+<pre><code>// 老写法
+(function(){ console.log('IIFE') })()
+
+// 新：箭头+IIFE
+(() => { console.log('arrow IIFE') })()
+
+// 跑在模块里其实用不到，但面试爱问，文件里在前端相关部分
+
+;(() => { /* code */ })()</code></pre>
+<p class="todo">：把 utils.js 里所有工具函数包进 IIFE，再测一遍 Jest，全局变量会清零</p>
+
+<h2>块级作用域 + 暂时性死区（TDZ）</h2>
+<pre><code>function demo() {
+  console.log(a) //  undefined（变量提升）
+  var a = 1
+  console.log(b) //  ReferenceError：TDZ
+  let b = 2
+}
+demo()</code></pre>
+<p class="warn"> Vue3 源码里大量用 let/const，TDZ 是真正会踩的坑——比如提前解构 props</p>
+
+<h2>箭头函数：没有 this、没有 arguments、不能 new</h2>
+<pre><code>const obj = {
+  val: 10,
+  regular: function () { console.log(this.val) },
+  arrow: () => console.log(this.val)
+}
+obj.regular() // 10
+obj.arrow()   // undefined（this 指向外层）</code></pre>
+<p class="todo"> 在 Axios 拦截器里写箭头函数，就不用存 _this 了</p>
+
+<h2>解构：默认值 + 重命名一把梭</h2>
+<pre><code>// 解决 后端返回字段名太丑
+const { data: list, total_count: total } = res.data
+
+// 嵌套 + 默认值
+const { a = 0, b: { c = 5 } = {} } = payload</code></pre>
+<p class="todo">封装 useTable 时，直接把分页字段解构出来，代码秒变清爽</p>
+
+<h2>5剩余/展开：rest 参数与数组字面量</h2>
+<pre><code>function log(type, ...args) {
+  console[type](...args)
+}
+log('warn', 'id:', 1, 'msg:', 'timeout')</code></pre>
+<p class="todo"> 把 console.log 包装成 logUtil，上线时一次性关闭。</p>
+
+<h2>短路逻辑：||= &&= ??= 三元运算符杀手</h2>
+<pre><code>// 老写法
+config.timeout = config.timeout || 5000
+
+// 新语法糖
+config.timeout ||= 5000
+
+// 只补 null/undefined
+config.retry ??= 3</code></pre>
+<p class="warn">?? 与 || 区别：前者不拦截 0 与 ''，做配置默认值时更安全。</p>
+
+<h2>Promise 链 → async/await 骨架</h2>
+<pre><code>// 链式地狱
+getToken()
+  .then(token => getUser(token))
+  .then(user => getPermissions(user.id))
+  .catch(err => console.error(err))
+
+//扁平化
+try {
+  const token = await getToken()
+  const user = await getUser(token)
+  const perms = await getPermissions(user.id)
+} catch (err) {
+  console.error(err)
+}</code></pre>
+<p class="todo">如果给 Axios 加自动刷新 token 逻辑，就用 async/await 写，可读性高</p>
+
+<h2>8. Promise.allSettled 批量请求不中断</h2>
+<pre><code>const reqs = [api.getA(), api.getB(), api.getC()]
+const res = await Promise.allSettled(reqs)
+
+const succ = res
+  .filter(r => r.status === 'fulfilled')
+  .map(r => r.value)
+const fail = res
+  .filter(r => r.status === 'rejected')
+  .map(r => r.reason)</code></pre>
+<p class="todo">同时拉 5 个字典数据，失败的不影响页面渲染，只弹提示</p>
+
+<h2>事件循环：macrotask vs microtask</h2>
+<pre><code>console.log(1)
+setTimeout(() => console.log(2), 0)   // macrotask
+Promise.resolve().then(() => console.log(3)) // microtask
+console.log(4)
+
+// 输出：1 → 4 → 3 → 2
+</code></pre>
+<p class="warn">Vue 的 nextTick 就是 Promise.then 的封装，属于 microtask，比 setTimeout 先跑</p>
+
+<h2>节流（throttle）与防抖（debounce），好像要背手写一遍</h2>
+<pre><code>// 防抖：连续触发只执行最后一次
+function debounce(fn, delay = 300) {
+  let timer = null
+  return function (...args) {
+    clearTimeout(timer)
+    timer = setTimeout(() => fn.apply(this, args), delay)
+  }
+}
+<p>未完待续（</p>
+
+
+
+</div>
+
+</body>
+</html>
