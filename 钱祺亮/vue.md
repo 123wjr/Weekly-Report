@@ -173,6 +173,7 @@ watch(){sum,(newValue,oldValue)=>{
   * v-for使用整数值时，会从1开始遍历到n（那个整数值）
   * 可以在`<template>`标签上使用v-for，多用于v-if与v-for在同一节点时的情况，因为v-if的优先级比v-for高，所以说v-if无法访问到v-for作用域内定义的变量别名，常常使用`<template>`上先使用v-for，然后在`<li>`或者`<ul>`上使用v-if
   * 通过key来管理，重用和重新排序现有的元素。（没懂，等到后面复习的时候再看看，不知道何意为）
+    * 不写key是以默认的索引值作为排序顺序
 
 ***局部样式`<style scoped>`保证样式只服务本.vue,不会和其他vue搞混***
 
@@ -190,12 +191,57 @@ function showH2(){
 }
 ```
 
-***
+***`<Person a='haha'/>`给子组件传数据，`defineProps(['a'])`在子组件就可以接收
+
+## props
+
+//接收并保存传来的数据
+`let x = defineProps(['a'])`
+//变量的传输使用v-bind：
+`<Person a='haha' :b='List'/>`
+//接收的时候还要加上限制类型,?控制可传可不传
+`let x = defineProps<[List?:Persons]>()`
+
+***withDefaults指定默认值，（已经弃用，可以解构）***
+
+***define类型的函数一般都是宏函数，不用引入***
 
 ## 生命周期钩子
 
 * 每个vue组件实例在创建时都需要经理一系列的初始化步骤，在此过程中会运行生命周期钩子的函数，在特定阶段运行自己的代码
 * onMounted钩子可以用来在组件完成初始渲染并创建dom节点后运行代码，还有其他钩子，在实例生命周期的不同阶段被调用，比如onUpdated和onUnmounted
 
+## TS
 
+### 接口
 
+```ts
+export interface PersonInter{
+  id:string,
+  name:string,
+  age:number
+}
+
+//一个自定义类型
+export type Persons = Array<PersonInter>
+
+import {type PersonInter,type Persons} form '@/xxx'
+
+//定义变量，是一个数组，并且每一项都符合接口规范
+let personList:Array<PersonInter> = [
+  {id:'qql24',name:'qql',age:19}
+  {id:'yinxia24',name:'hjy',age:19}
+]
+
+//另一种
+let personList:Persons = [
+  {id:'qql24',name:'qql',age:19}
+  {id:'yinxia24',name:'hjy',age:19}
+]
+
+//reactive响应式
+let personList = reactive<pPersons>([
+  {id:'qql24',name:'qql',age:19}
+  {id:'yinxia24',name:'hjy',age:19}
+])
+```
